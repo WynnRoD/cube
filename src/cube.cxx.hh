@@ -194,13 +194,14 @@ inline bool __CUBE_CXX_FN_ATTR basic_bits_wrapper::operator!=(
 inline std::ostream& __CUBE_CXX_FN_ATTR
 operator<<(std::ostream& _Os, basic_bits_wrapper _Val) noexcept {
   auto flags = _Os.flags();
-
+#if ZERO_HEX_NON_EXPAND
   if (_Val == 0)
     _Os << std::setfill(' ') << std::setw(18) << "0";
-  else {
+  else
+#endif
     _Os << "0x" << std::setfill('0') << std::setw(16) << std::hex
         << std::uppercase << static_cast<unsigned long long>(_Val);
-  }
+
   _Os.flags(flags);
 
   return _Os;

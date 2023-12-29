@@ -56,7 +56,17 @@ int main(int argc, char const *const argv[]) {
                                   ? cube::board5ds_layout::dark
                                   : cube::board6ds_layout::dark;
 
+  const cube::bitboard blacks = min_delta == cube::diags_min
+                                    ? cube::board5ds_layout::black
+                                    : cube::board6ds_layout::black;
+
+  const cube::bitboard whites = min_delta == cube::diags_min
+                                    ? cube::board5ds_layout::white
+                                    : cube::board6ds_layout::white;
+
   file << "/* valid / dark squares */\n" << base << "\n\n";
+  file << "/* black pawns setup */\n" << blacks << "\n\n";
+  file << "/* white pawns setup */\n" << whites << "\n\n";
 
   cube::append_ranks(right, file);
   cube::append_numbers(base, file);
@@ -129,14 +139,12 @@ void append_attacks(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
   }
 
   constexpr auto last = n_total_squares;
-  constexpr auto n    = n_diagonals / 2;
 
   _Os << "/* attack squares */\n";
 
   for (auto __x = 0; __x < last; ++__x)
-    _Os << att[__x][0] << ", " << att[__x][1] << ",\n"
-        << att[__x][2] << ", " << att[__x][3]
-        << ((__x < last - 1) ? ",\n" : "\n");
+    _Os << att[__x][0] << ", " << att[__x][1] << "," << att[__x][2] << ", "
+        << att[__x][3] << ((__x < last - 1) ? ",\n" : "\n");
 
   _Os << "\n\n";
 }
@@ -159,13 +167,14 @@ void append_betweens(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
         btw[__m.index()][__dst.index()] = ray(__m.index(), __dst.index(), __dx);
 
   constexpr auto last = n_total_squares;
-  constexpr auto n    = 2;
+  constexpr auto n    = 4;
 
   _Os << "/* squares between */\n";
 
   for (auto __x = 0; __x < last; ++__x)
     for (auto __y = 0; __y < last; __y += n)
-      _Os << btw[__x][__y] << ", " << btw[__x][__y + 1]
+      _Os << btw[__x][__y + 0] << ", " << btw[__x][__y + 1] << ", "
+          << btw[__x][__y + 2] << ", " << btw[__x][__y + 3]
           << ((__x < last - 1 || last - n > __y) ? ",\n" : "\n");
 
   _Os << "\n\n";
