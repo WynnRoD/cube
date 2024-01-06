@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 
-
 namespace cube {
 
 using diagonals = int const (&)[n_diagonals];
@@ -14,18 +13,16 @@ void append_nexts(bitboard, std::ostream&, diagonals);
 void append_attacks(bitboard, std::ostream&, diagonals);
 void append_betweens(bitboard, std::ostream&, diagonals);
 
-} // namespace cube
-
-// Number of columns to print 
+// Number of columns to print
 // NOTE: powers of two in the range [n_diagonals, n_total_squares]
 //
 // for i in rows
 //  for j in cols
-//    i * cols + j = i,j
-//
-// i = x + w * y <==> x = i % w, y = i / w
+//    i * cols + j = i,j <==> i = x / w, j = x % w
 
-constexpr int breakline = cube::n_total_squares >> 2;
+constexpr int breakline = n_total_squares >> 2;
+
+} // namespace cube
 
 int main(int argc, char const *const argv[]) {
   static_assert(cube::board6ds_layout::rank<9>::value ==
@@ -105,7 +102,7 @@ void append_numbers(bitboard _Dark, std::ostream& _Os) {
   _Os << "/* Standard Notation */\n";
   for (auto __x = 0, num = 0; __x < n_total_squares; ++__x) {
     if (__x && __x < n_total_squares)
-      _Os << ", ";
+      _Os << ",";
     if (__x && (__x % 8) == 0)
       _Os << "\n";
 
@@ -172,8 +169,8 @@ void append_nexts(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
       const int i = r * cols + c;
       if (i) {
         if (i < rows * cols)
-          _Os << ", ";
-        if (i % breakline == 0)
+          _Os << ",";
+        if (i % (breakline << 2) == 0)
           _Os << "\n";
       }
       _Os << std::setw(2) << std::setfill(' ') << value;
@@ -200,14 +197,29 @@ void append_attacks(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
     }
   }
 
-  constexpr auto last = n_total_squares;
-
   _Os << "/* Attack Squares (square, diagonal) */\n";
+#if 0
+
+  constexpr auto last = n_total_squares;
 
   for (auto __x = 0; __x < last; ++__x)
     _Os << att[__x][0] << ", " << att[__x][1] << ", " << att[__x][2] << ", "
         << att[__x][3] << ((__x < last - 1) ? ",\n" : "\n");
+#else
 
+  constexpr int n_items = n_total_squares * n_diagonals;
+
+  for (auto __x = 0; __x < n_items; ++__x) {
+    if (__x) {
+      if (__x < n_items)
+        _Os << ",";
+      if (__x % breakline == 0)
+        _Os << "\n";
+    }
+    _Os << att[__x / n_diagonals][__x % n_diagonals];
+  }
+
+#endif
   _Os << "\n\n";
 }
 
@@ -233,6 +245,8 @@ void append_betweens(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
 
   _Os << "/* Between Squares (s0, s1) */\n";
 
+#if 0
+
   for (auto __x = 0; __x < last; ++__x)
     for (auto __y = 0; __y < last; __y += n)
       _Os << btw[__x][__y + 0] << ", " << btw[__x][__y + 1] << ", "
@@ -241,6 +255,21 @@ void append_betweens(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
           << btw[__x][__y + 6] << ", " << btw[__x][__y + 7]
           << ((__x < last - 1 || last - n > __y) ? ",\n" : "\n");
 
+#else
+
+  constexpr int n_items = n_total_squares * n_total_squares;
+
+  for (auto __x = 0; __x < n_items; ++__x) {
+    if (__x) {
+      if (__x < n_items)
+        _Os << ",";
+      if (__x % breakline == 0)
+        _Os << "\n";
+    }
+    _Os << btw[__x / n_total_squares][__x % n_total_squares];
+  }
+
+#endif
   _Os << "\n\n";
 }
 
