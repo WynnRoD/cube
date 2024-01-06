@@ -145,7 +145,7 @@ void append_nexts(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
           next[__x][(&__dx - _Distances)] = __x + __dx;
   }
 
-  #if USE_DIAGS_AS_ROWS
+  #if CUBE_USE_DIAGS_AS_ROW
   constexpr int rows = n_diagonals;
   constexpr int cols = n_total_squares;
   #else
@@ -153,7 +153,7 @@ void append_nexts(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
   constexpr int cols = n_diagonals;
   #endif
 
-  #if USE_DIAGS_AS_ROWS
+  #if CUBE_USE_DIAGS_AS_ROW
   _Os << "/* Next Square (diagonal, square) */\n";
   #else
   _Os << "/* Next Square (square, diagonal) */\n";
@@ -161,7 +161,7 @@ void append_nexts(bitboard _Dark, std::ostream& _Os, diagonals _Distances) {
 
   for (auto r = 0; r < rows; ++r) {
     for (auto c = 0; c < cols; ++c) {
-  #if USE_DIAGS_AS_ROWS
+  #if CUBE_USE_DIAGS_AS_ROW
       int value = next[c][r];
   #else
       int value = next[r][c];
